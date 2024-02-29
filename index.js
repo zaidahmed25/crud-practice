@@ -1,15 +1,39 @@
 const express = require('express')
-const app = express()
-const port = 3000
+const app = express();
+const cors = require('cors');
+const mongoose = require('mongoose');
+const {addStudent , getStudent , getSingleStudent , deleteStudent , updateStudent} = require('./controllers/studentconroller');
+require('dotenv')
+
+const port = process.env.port
+
+// MIDDLEWRE
+app.use(cors())
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Home')
+  res.send('Hello World')
 })
 
-app.listen(port, () => {
-  console.log(`hello world ${port}`)
+app.get('/api/v1/students', getStudent);
+app.get('/api/v1/students/:id', getSingleStudent)
+app.post('/api/v1/students', addStudent);
+app.delete('/api/v1/students/:id', deleteStudent);
+app.put('/api/v1/students/:id', updateStudent);
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log('DATABASE CONNECTED');
+  } catch (error) {
+    console.log(error);
+  }
+}
+connectDB().then(() => {
+  app.listen(process.env.PORT)
+}).catch((err) => {
+  console.log(err)
 })
 
 
 
-// mongodb+srv://zaidahmedghazi:<password>@cluster0.nj0cgcn.mongodb.net/
